@@ -4229,6 +4229,9 @@ def indices_of_revolutions(signed_list):
             list_of_revolution_indices.append(i)
     return list_of_revolution_indices
 
+def revolution_count(signed_list):
+    #todo add revolution count to indices of revolutions function above
+
 def indices_of_zeros(cumulative_signed_modulo_list):
     list_of_zero_indices=[]
     for i in range(len(cumulative_signed_modulo_list[:200])) :
