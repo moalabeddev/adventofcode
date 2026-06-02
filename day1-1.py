@@ -1,4 +1,12 @@
-txt="""
+'''
+
+Welcome to GDB Online.
+GDB online is an online compiler and debugger tool for C, C++, Python, Java, PHP, Ruby, Perl,
+C#, OCaml, VB, Swift, Pascal, Fortran, Haskell, Objective-C, Assembly, HTML, CSS, JS, SQLite, Prolog.
+Code, Compile, Run and Debug online from anywhere in world.
+
+'''
+rotation_text="""
 R9
 L8
 L26
@@ -4186,97 +4194,125 @@ L20
 L25
 R16
 """
+import math
 
-_input = txt.splitlines()
+rotation_commands = rotation_text.splitlines()
 
+def parse_rotations_to_signed_values(rotation_commands):
+    signed_rotations = []
 
-def sign_elements(data):
-    signed_data=[]
-    for rotation in _input:
-        if rotation.find("L") == -1: #Right rotation    
-            rotation = rotation.replace("R","")
-        rotation = rotation.replace("L","-")
-        rotation = (rotation)
-        if rotation != '':
-            signed_data.append(int(rotation))
-    return signed_data
+    for command in rotation_commands:
+        if "L" not in command:  # Right rotation
+            command = command.replace("R", "")
 
-def cumulative_signed_elements(signed_data):
-    running_total=[]
-    starting_value =50
-    for x in signed_data:
-        starting_value = (starting_value+x) 
-        running_total.append(starting_value)
-    return running_total
+        command = command.replace("L", "-")
 
-def cumulative_signed_modulo_elements(signed_data):
-    running_total=[]
-    starting_value =50
-    for x in signed_data:
-        starting_value = (starting_value+x) % 100
-        running_total.append(starting_value)
-    return running_total
+        if command:
+            signed_rotations.append(int(command))
 
-def indices_of_revolutions(signed_list):
-    list_of_revolution_indices=[]
-    for i in range(len(signed_list)):
-        if i==0:
-            effective_degrees_travelled =50
-        else: 
-            effective_degrees_travelled= cumulative_signed_modulo_list[i] - cumulative_signed_modulo_list[i-1]
+    return signed_rotations
+
+def cumulative_rotation_modulo_100(signed_rotations):
+    wrapped_positions = []
+    current_position = 50
+
+    for rotation in signed_rotations:
+        current_position = (current_position + rotation) % 100
+        wrapped_positions.append(current_position)
+
+    return wrapped_positions
+
+def find_zero_position_indices(wrapped_positions):
+    zero_indices = []
+
+    for index, position in enumerate(wrapped_positions):
+        if position == 0:
+            zero_indices.append(index)
+
+    return zero_indices
+
+def count_zero_positions(values):
+    zero_count = 0
+
+    for value in values:
+        if value == 0:
+            zero_count += 1
+
+    return zero_count
+
+#todo inspect this function
+def find_revolution_indices(signed_rotations):
+    revolution_indices = []
+
+    for index in range(len(signed_rotations)):
+        if index == 0:
+            effective_rotation = 50
+        else:
+            effective_rotation = (
+                wrapped_positions[index]
+                - wrapped_positions[index - 1]
+            )
+
+        crossed_boundary = (
+            effective_rotation != signed_rotations[index]
+            and wrapped_positions[index] != 0
+            and index != 0
+        )
+
+        if crossed_boundary:
+            revolution_indices.append(index)
+
+    return revolution_indices
+
+def revolution_count_map(revolution_indices):
+    revolution_count_map = {
+        revolution_index:{
             
-        if (effective_degrees_travelled != signed_list[i]) * (cumulative_signed_modulo_list[i]!=0) *(i!=0) ==1:
-            list_of_revolution_indices.append(i)
-    return list_of_revolution_indices
-
-def revolution_count(signed_list):
-    #todo add revolution count to indices of revolutions function above
-
-def indices_of_zeros(cumulative_signed_modulo_list):
-    list_of_zero_indices=[]
-    for i in range(len(cumulative_signed_modulo_list[:200])) :
-        if cumulative_signed_modulo_list[i]==0:
-            list_of_zero_indices.append(i)
-    return list_of_zero_indices
-
-
-def count_zeros(data):
-    total =0
-    for x in data:
-        if x==0:
-            total+=1
-    return total
+            "signed_rotation":signed_rotations[revolution_index], 
+            "revolution_count": -(math.floor(signed_rotations[revolution_index]/100)) if signed_rotations[revolution_index]<=0 else math.ceil(signed_rotations[revolution_index]/100)
+            
+        } for revolution_index in revolution_indices
         
+    }
+    return revolution_count_map
+    
+def revolution_count_list(revolution_count_map):
+    revolution_count_list=[]
+    for key , value in revolution_count_map.items():
+        for key, value in value.items():
+            if key=="revolution_count":
+                revolution_count_list.append(value)
+    return revolution_count_list
+
+def count_revolutions(revolution_count_list):
+    return sum(revolution_count_list)
 
 
-signed_list= sign_elements(_input)
-print(signed_list[:10])
-print(len(signed_list))
 
 
-cumulative_signed_modulo_list = cumulative_signed_modulo_elements(signed_list)
-print(cumulative_signed_modulo_list[:10])
-print(len(cumulative_signed_modulo_list))
 
-answer= count_zeros(cumulative_signed_modulo_list)
-print(answer)
+signed_rotations = parse_rotations_to_signed_values(rotation_commands)
+# print("signed_rotations" *10)
+#print(signed_rotations)
+# print(len(signed_rotations))
+# print("signed_rotations" *10)
 
+wrapped_positions = cumulative_rotation_modulo_100(signed_rotations)
+# print("wrapped_positions" *10)
+# print(wrapped_positions)
+# print(len(wrapped_positions))
+# print("wrapped_positions" *10)
 
-print("==============================================================")
-print("==============================================================")
+zero_count = count_zero_positions(wrapped_positions)
+print(zero_count)
 
-print(indices_of_zeros(cumulative_signed_modulo_list))
+revolution_indices = find_revolution_indices(signed_rotations)
 
-print(indices_of_revolutions(signed_list))
-for i in range(len(cumulative_signed_modulo_list[:200])) :
-    if cumulative_signed_modulo_list[i]==0:
-        print(f"Index :{i}, {cumulative_signed_modulo_list[i]}")
-print("==============================================================")
-print("==============================================================")  
+revolution_count_map=revolution_count_map(revolution_indices)
 
+revolution_count_list=revolution_count_list(revolution_count_map)
 
-print(len(indices_of_zeros(cumulative_signed_modulo_list)))
+revolution_count=count_revolutions(revolution_count_list)
 
-print(len(indices_of_revolutions(signed_list)))
-
-print(max((signed_list)))
+print(revolution_count)
+print(zero_count+revolution_count)
