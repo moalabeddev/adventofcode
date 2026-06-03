@@ -4241,4 +4241,3 @@ print(len(cumulative_signed_list))
 
 answer= count_zeros(cumulative_signed_list)
 print(answer)
-
