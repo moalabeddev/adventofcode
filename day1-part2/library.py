@@ -22,71 +22,34 @@ def cumulative_rotation_modulo_100(signed_rotations):
         current_position = (current_position + rotation) % 100
         wrapped_positions.append(current_position)
 
+    wrapped_positions.insert(0,50) #initial position before application of signed rotations
     return wrapped_positions
 
-def find_zero_position_indices(wrapped_positions):
-    zero_indices = []
-
-    for index, wrapped_position in enumerate(wrapped_positions):
-        if wrapped_position == 0:
-            zero_indices.append(index)
-
-    return zero_indices
-
-def count_zero_positions(wrapped_positions):
-    zero_count = 0
-
-    for wrapped_position in wrapped_positions:
-        if wrapped_position == 0:
-            zero_count += 1
-
-    return zero_count
-
-#todo inspect this function
-def find_revolution_indices(signed_rotations):
-    revolution_indices = []
-    wrapped_positions = cumulative_rotation_modulo_100(signed_rotations)
-
-    for index in range(len(signed_rotations)):
-        if index == 0:
-            effective_rotation = 50
+def count_crossings(signed_rotations, wrapped_positions):
+    crossing_counter=0
+    for i in range(len(signed_rotations)):
+        #print(i, "Index") #debugging
+        if signed_rotations[i]>0:
+            #print("=",signed_rotations[i], "signed_rotations") #debugging
+            applied_rotations=0
+            
+            while applied_rotations<signed_rotations[i]:
+                
+                if (wrapped_positions[i]+applied_rotations)%100 == 0:
+                    crossing_counter +=1
+                    #print("===",crossing_counter, "crossing_counter!!!") #debugging
+                applied_rotations +=1
+                #print("==",applied_rotations, "applied_rotations") #debugging
         else:
-            effective_rotation = (
-                wrapped_positions[index]
-                - wrapped_positions[index - 1]
-            )
-
-        crossed_boundary = (
-            effective_rotation != signed_rotations[index]
-            and wrapped_positions[index] != 0
-            and index != 0
-        )
-
-        if crossed_boundary:
-            revolution_indices.append(index)
-
-    return revolution_indices
-
-def revolution_count_map(revolution_indices,rotation_commands):
-    signed_rotations = parse_rotations_to_signed_values(rotation_commands)
-    revolution_count_map = {
-        revolution_index:{
+            #print("=",signed_rotations[i],"signed_rotations") #debugging
+            applied_rotations=0
             
-            "signed_rotation":signed_rotations[revolution_index], 
-            "revolution_count": -(math.floor(signed_rotations[revolution_index]/100)) if signed_rotations[revolution_index]<=0 else math.ceil(signed_rotations[revolution_index]/100)
-            
-        } for revolution_index in revolution_indices
-        
-    }
-    return revolution_count_map
-    
-def revolution_count_list(revolution_count_map):
-    revolution_count_list=[]
-    for key , value in revolution_count_map.items():
-        for key, value in value.items():
-            if key=="revolution_count":
-                revolution_count_list.append(value)
-    return revolution_count_list
+            while applied_rotations< -(signed_rotations[i]):
+                
+                if (wrapped_positions[i]-applied_rotations)%100 == 0:
 
-def count_revolutions(revolution_count_list):
-    return sum(revolution_count_list)
+                    crossing_counter+=1
+                    #print("===",crossing_counter, "crossing_counter!!!") #debugging
+                applied_rotations +=1
+                #print("==",applied_rotations, "applied_rotations") #debugging
+    return crossing_counter
