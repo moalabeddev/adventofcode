@@ -4227,17 +4227,18 @@ def count_zeros(cumulative_signed_data):
             total+=1
     return total
         
-        
 
-signed_list= sign_elements(_input)
-print(signed_list[:10])
-print(len(signed_list))
-
-
-cumulative_signed_list = cumulative_signed_elements(signed_list)
-print(cumulative_signed_list[:10])
-print(len(cumulative_signed_list))
-
-
-answer= count_zeros(cumulative_signed_list)
-print(answer)
+if __name__ == "__main__":
+    
+    signed_list= sign_elements(_input)
+    print(signed_list[:10])
+    print(len(signed_list))
+    
+    
+    cumulative_signed_list = cumulative_signed_elements(signed_list)
+    print(cumulative_signed_list[:10])
+    print(len(cumulative_signed_list))
+    
+    
+    answer= count_zeros(cumulative_signed_list)
+    print(answer)
