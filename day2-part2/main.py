@@ -1,20 +1,26 @@
-from input_puzzle import input_puzzle , raw_input_
-from library import generate_product_ids, stringify_product_ids
+from input_puzzle import input_puzzle 
+from tqdm import tqdm #تقدم 
+import re
+
+INVALID_PATTERN_ID_1 = r'^(\d+)\1$'
+INVALID_PATTERN_ID_2 = r'^(\d+)(\1)+$'
 
 
-
-
-# product_ids = generate_product_ids(input_puzzle)
-# print(product_ids)
-
-# print("="*62)
-
-# stringified_product_ids=stringify_product_ids(product_ids)
-# print(stringified_product_ids)
-
-# def generate_parity_pure_product_ids(stringified_product_ids: list[str]):
-
-for string_product_id in raw_input_:
-    print(string_product_id)
-    for i in range(len(string_product_id)):
-        print((i, string_product_id[i]))
+def invalid_sum():
+    product_ids=[]
+    invalid_sum=0
+    invalid_product_ids=[]
+    for product_id_range in tqdm(input_puzzle, desc="Processing Puzzle Ranges"):
+        lower_bound, upper_bound = product_id_range
+        product_ids+= list(range(lower_bound, upper_bound+1))
+    for i, product_id in enumerate(product_ids):
+        if re.search(INVALID_PATTERN_ID_2, str(product_id)) is not None:
+            invalid_sum +=int(product_id)
+            invalid_product_ids.append((i, product_id))
+                
+    return "{0}\n {1}".format(invalid_sum , invalid_product_ids)
+    
+    
+if __name__ == "__main__":
+   
+   print(invalid_sum())
