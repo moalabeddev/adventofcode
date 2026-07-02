@@ -1,59 +1,39 @@
 from input_puzzle import input_puzzle
-import re
 
-banks = input_puzzle.strip().splitlines()
+battery_banks = input_puzzle.splitlines(keepends = False)
+battery_banks = battery_banks[1:]
 
-def version_1():
-    answer=0
-    for bank in banks:
-        unique_voltages=set(bank)
-        print("="*20)
-        print(sorted(list(unique_voltages)),"\n")
-        print(sorted(list(unique_voltages))[-2:],"\n")
-        print(sorted(list(unique_voltages))[-2:],"\n")    
-        max_unique_voltages = sorted(list(unique_voltages))[-2:]
-        print(list(map(int,max_unique_voltages)))
-        print(sum(map(int,max_unique_voltages)))
-        print("="*20)
-        answer+=sum(map(int,max_unique_voltages))
-    return answer
     
-    
-def version_2():
-    answer=0
-    for bank in banks:
-        print("="*20)
-        print(bank, "\n")
-        print(sorted(list(bank)),"\n")
-        print(sorted(list(bank))[-2:],"\n")
-        print(sorted(list(bank))[-2:],"\n")    
-        max_voltages = sorted(list(bank))[-2:]
-        print(list(map(int,max_voltages)))
-        print(sum(map(int,max_voltages)))
-        print("="*20)
-        answer+=sum(map(int,max_voltages))
-    return answer
+def search_two_highest_batteries(battery_bank):
 
-def sanity_check():
-    import math
-    max_bank_count= -math.inf
-    min_bank_count= +math.inf
+    highest_battery= max(battery_bank)
+
+    new_battery_bank = remove_highest_voltage_battery(battery_bank, highest_battery)
     
-    input_puzzle_length = len(input_puzzle)
-    split_and_stripped_banks_count = len(banks)
+    second_highest_battery = max(new_battery_bank)
     
-    total_character_count=0
-    for bank in banks:
-        if len(bank)> max_bank_count:
-            max_bank_count=len(bank)
+    two_highest_batteries = arrange_two_highest_batteries(battery_bank, highest_battery , second_highest_battery)
+    
+    return two_highest_batteries
+    
+    
+def remove_highest_voltage_battery(battery_bank,highest_battery):
+    new_battery_bank =list(filter(lambda x : x!= highest_battery, battery_bank))
+    return new_battery_bank
+    
+def arrange_two_highest_batteries(battery_bank, highest_battery , second_highest_battery):
+    highest_battery_index = battery_bank.index(highest_battery)
+    second_highest_battery_index = battery_bank.index(second_highest_battery)
+    if highest_battery_index < second_highest_battery_index:
+        return "".join((highest_battery, second_highest_battery))
+    else:
+        return "".join((second_highest_battery, highest_battery))
         
-        if len(bank)< min_bank_count:
-            min_bank_count=len(bank)
-            
-        total_character_count+=len(bank)
-    return "{0} == {1} * {2} ? max={3} min={4}".format(input_puzzle_length,split_and_stripped_banks_count , total_character_count ,min_bank_count, max_bank_count)
-    
 if __name__ == "__main__":
-    version_1()
-    version_2()
-    print(sanity_check())
+    for i , battery_bank in enumerate(battery_banks):
+        print(i, (sorted(battery_bank)[-2:], search_two_highest_batteries(battery_bank)))
+        
+    print("="*60)
+    
+    result=sum(int(search_two_highest_batteries(battery_bank)) for battery_bank in battery_banks )
+    print(result)
