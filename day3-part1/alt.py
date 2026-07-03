@@ -3,27 +3,37 @@ from input_puzzle import input_puzzle
 battery_banks = input_puzzle.splitlines(keepends = False)
 battery_banks = battery_banks[1:]
 
-def index_of_highest_possible_voltage(battery_bank):
-    
-    for current_available_max_digit in range(9,0,-1):
+result =0
 
-        for index , battery in enumerate(battery_bank[::-1]):
+class BatteryBankSlice(dict):
+    def __str__(self):
+        return "\n".join( ("{0}:{1}").format(k,v) for k,v in self.items())
+        
 
-            chop_index = len(battery) -2
 
-            if current_available_max_digit == int(battery):
+def battery_bank_slices_per_possible_leading_battery(battery_bank)-> BatteryBankSlice:
+    battery_bank_slice=BatteryBankSlice()
+    for max_digit in range(9,0,-1):
+        # print("max_digit",max_digit)
+        for index, battery in enumerate(battery_bank[::-1]):
+            # print(index, battery)
+            if max_digit == int(battery):
+                battery_bank_slice[index,max_digit] =battery_bank[-index:]
+    return battery_bank_slice
 
-                print(index, current_available_max_digit, battery , battery_bank[(chop_index-index):])
-                
-                lead_battery_index = chop_index - index
+def maximum_second_battery(battery_bank_slice):
+    combinations = [ int(str(k[1])+max(v)) for k,v in battery_bank_slice.items()]
+    return(max(combinations))
 
-                first_battery = battery_bank[lead_battery_index]
-                
-                return (first_battery, battery_bank[(chop_index-index+1):])
+def total_voltage(battery_banks):
+    for i, battery_bank in enumerate(battery_banks):
+        chops = battery_bank_slices_per_possible_leading_battery(battery_bank)
+        
+        global result
+        result+=maximum_second_battery(chops)
+        print(i,maximum_second_battery(chops))
+    print(result)
 
-                break
-        break
-    
-print(index_of_highest_possible_voltage(battery_banks[0]))
+total_voltage(battery_banks)
 
 
